@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head id="top">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>{% block title %}Nil Castillon Media{% endblock %}</title>
+	
+	<link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='assets/img/icon/logo.png') }}">
+
+	<!-- Global stylesheets -->
+	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+	<link href="{{ url_for('static',filename='css/vendors/bootstrap-5.3.3/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+	<link href="{{ url_for('static',filename='css/base.css') }}" rel="stylesheet" type="text/css">
+	<link href="{{ url_for('static',filename='css/custom.css') }}" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+	
+	<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+	<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+	<!-- Theme JS files -->
+	<script src="{{ url_for('static',filename='js/vendors/jquery-3.7.1/jquery.min.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/vendors/bootstrap-5.3.3/bootstrap.bundle.min.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/utils.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/custom.js') }}"></script>
+	<script id="pages_script" src="{{ url_for('static',filename='js/pages/pages.js') }}" type="text/javascript"></script>
+	<!-- /theme JS files -->
+	<style>
+		.material-symbols-outlined {
+		  font-variation-settings:
+		  'FILL' 0,
+		  'wght' 400,
+		  'GRAD' 0,
+		  'opsz' 24
+		}
+    </style>
+
+    {% block styles %}{% endblock %}
+
+</head>
+
+<body>
+	<div class="container">
+		<nav class="navbar navbar-expand-lg flex-column rounded vertical-height-100" id="mainNav">
+			<div class="navbar-brand-container w-100 d-flex">
+				<button class="navbar-toggler custom-toggler collapsed me-5" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
+					style="align-self: center;" id="navbarToggler">
+					<span class="toggler-icon top-bar"></span>
+					<span class="toggler-icon middle-bar"></span>
+					<span class="toggler-icon bottom-bar"></span>
+				</button>
+				<a class="navbar-brand mx-md-auto ml-auto" href="#top">
+					Nil Castillón Media
+				</a>
+			</div>
+	  
+			<div class="justify-content-md-center navbar-bottom" id="navbarContent">
+				<ul class="navbar-nav text-center">
+				  <li class="nav-item">
+					<a class="nav-link" href="#projects">Gallery</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#services">Services</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#about">About me</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#contact">Contact</a>
+				  </li>
+				</ul>
+			</div>
+		</nav>
+
+
+		<!-- main -->
+		<div class="main active">
+
+			<div id="content">
+                {% block content %}{% endblock %}
+				<section id="projects" class="section-container">
+					<div class="margins">
+						<h1 style="margin-top: 1rem; margin-bottom: 5rem;">OM Management</h1>
+						<h2 style="margin-bottom: 2rem;">
+							Financial Solutions for Non Investors
+						</h2>
+						<p>
+							At OM Management, we understand that financial success is as unique 
+							as you are. That's why we specialize in tailoring personalized financial 
+							strategies to match your individual needs, aspirations, and risk tolerance. 
+							With a steadfast commitment to maximizing returns while managing risk, our 
+							team of experienced advisors is dedicated to guiding you towards achieving 
+							your financial objectives with confidence and peace of mind.
+						</p>
+					</div>
+				</section>
+				<section id="services" class="section-container white" style="padding: 3rem 0 3rem 2rem;">
+					<div class="row" style="padding: 0; gap: 0;">
+						<div class="col">
+							<h2 style="color: var(--color-dark); margin-top: auto; margin-bottom: auto;">
+								The Numbers Reflect Our Reputation.
+							</h2>
+						</div>
+						<div style="background-color: var(--color-primary); height: 100%; padding: 2rem 2rem 2rem 2rem;">
+							<p class="white" style="font-size: 20px;">
+								Efficient problem-solving, insightful market analysis, and actionable 
+								plans made the consulting invaluable to our business's success.
+							</p>
+							<div class="row text-center" style="margin-top: 2rem;">
+								<div class="col" style="padding: 0; gap: 0;">
+									<span class="material-symbols-outlined white" style="font-size: 40px;">trending_up</span>
+									<h2 style="font-size: 46px; margin-bottom: 1rem;">+8%</h2>
+									<p class="white" style="font-size: 20px;">Steady benefits each year.</p>
+								</div>
+								<div class="col" style="padding: 0; gap: 0;">
+									<span class="material-symbols-outlined white" style="font-size: 40px;">calculate</span>
+									<h2 style="font-size: 46px; margin-bottom: 1rem;">&#60;5%</h2>
+									<p class="white" style="font-size: 20px;">Minimized risks by our experts.</p>
+								</div>
+								<div class="col" style="padding: 0; gap: 0;">
+									<span class="material-symbols-outlined white" style="font-size: 40px;">calendar_month</span>
+									<h2 style="font-size: 46px; margin-bottom: 1rem;">7+</h2>
+									<p class="white" style="font-size: 20px;">High experience in the sector.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<section id="about">
+					<div class="col masterhead">
+						<div class="margins">
+							<h1 style="margin-top: 1rem; margin-bottom: 5rem;">OM Management</h1>
+							<h2 style="margin-bottom: 2rem;">
+								Financial Solutions for Non Investors
+							</h2>
+							<p>
+								At OM Management, we understand that financial success is as unique 
+								as you are. That's why we specialize in tailoring personalized financial 
+								strategies to match your individual needs, aspirations, and risk tolerance. 
+								With a steadfast commitment to maximizing returns while managing risk, our 
+								team of experienced advisors is dedicated to guiding you towards achieving 
+								your financial objectives with confidence and peace of mind.
+							</p>
+						</div>
+						<div class="row skyscraper-background">
+							<div class="card" style="align-self: flex-start; margin-right: auto; width:50%">
+								<p>To achieve </p>
+								<ul>
+									<li>Personalized Investment Advising</li>
+									<li>Based on Client defined Maximum risk</li>
+									<li>Adapted to the Client's Capital amount</li>
+									<li>Ensuring Optimal Diversification</li>
+									<li>Alerts on Every new movement</li>
+								</ul>
+							</div>
+							<!-- <img src="../static/assets/img/skyscrappers/skyscrapper.png"> -->
+						</div>
+					</div>
+					<div class="row first-background">
+						<div class="card" style="margin-left: auto; width:50%">
+							<h2 style="display: flex; margin-left: auto; padding-right: 2rem;">
+								Delivering Results From Experience
+							</h2>
+							<p>
+								We provide bespoke financial solutions to meet the unique 
+								needs of each case. Investors can gain exposure to a series of 
+								wealth management solutions instantly based on risk tolerance. 
+								Our experience in capital management .
+							</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="card-transparent">
+							<h2 style="display: flex; margin-right: auto; padding-left: 2rem;">
+								Delivering Results From Experience
+							</h2>
+							<p>
+								We provide bespoke financial solutions to meet the unique 
+								needs of each case. Investors can gain exposure to a series of 
+								wealth management solutions instantly based on risk tolerance. 
+								Our experience in capital management .
+							</p>
+						</div>
+						<div class="card">
+						</div>
+					</div>
+				</section>
+				<section id="contact">
+					<h1 class="primary">
+						Let's bring your vision
+						<br>
+						to life.
+					</h1>
+					<span class="text-center">
+						Camara, lights and action.
+					</span>
+					<form action="#" class="subscribe">
+						<input type="email" placeholder="Your email address...">
+						<button class="btn-four">Subscribe</button>
+					</form>
+				</section>
+			</div>
+
+		</div>
+
+		<footer class="my-4">
+			<ul class="nav justify-content-center mb-3">
+			  <li class="nav-item"><a href="#top" class="nav-link px-2 text-body-secondary">Home</a></li>
+			  <li class="nav-item"><a href="#projects" class="nav-link px-2 text-body-secondary">Gallery</a></li>
+			  <li class="nav-item"><a href="#services" class="nav-link px-2 text-body-secondary">Pricing</a></li>
+			  <li class="nav-item"><a href="#about" class="nav-link px-2 text-body-secondary">About</a></li>
+			  <li class="nav-item"><a href="#contact" class="nav-link px-2 text-body-secondary">Contact</a></li>
+			</ul>
+			<p class="text-center text-body-secondary">© 2024 Company, Inc</p>
+		</footer>
+
+
+	</div>
+
+	<script>
+		// Sidebar management
+		function sidebarScroll() { 
+
+			let sidebar = document.querySelector('.navigation');
+			var scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+			
+			if (sidebar) {
+				var nav_links = document.querySelectorAll(".navigation li");
+				for (let l of nav_links) {
+					if (!l.classList.contains('unhovered')){
+						let section = document.querySelector(`#${l.querySelector('a').href.split('#').at(-1)}`);
+						if (section) {
+							if (section.getBoundingClientRect().top <= 150 & 150 <= section.getBoundingClientRect().bottom) {
+								l.classList.add('unhovered');
+								l.classList.add('hovered');
+								setTimeout(function () {l.classList.remove('unhovered');}, 1);
+							} else {
+								//l.classList.add('unhovered');
+								l.classList.remove('hovered');
+								//l.classList.remove('unhovered');
+							}
+						}
+					}
+				}
+			}
+		
+		};
+
+		function elementsDistance(element1, element2) {
+
+			
+			let y = (element1.getBoundingClientRect().top + element1.getBoundingClientRect().height/2) - (element2.getBoundingClientRect().top + element2.getBoundingClientRect().height/2);
+			let x = element1.getBoundingClientRect().left - element2.getBoundingClientRect().left;
+			console.log(`Sidebar element: top(${element1.getBoundingClientRect().top}) height(${element1.getBoundingClientRect().height}) left(${element1.getBoundingClientRect().left}) width(${element1.getBoundingClientRect().width})`);
+			console.log(`Top element: top(${element2.getBoundingClientRect().top}) height(${element2.getBoundingClientRect().height}) left(${element2.getBoundingClientRect().left}) width(${element2.getBoundingClientRect().width})`);
+			return [Math.round(x), Math.round(y)];
+		}
+
+		function brandManage() {
+			if (document.querySelector('.main').classList.contains('active')) {
+				// document.querySelector('.brand-title-top').style.opacity = 1;
+				// document.querySelector('#logo_sidebar .title').style.display = 'none';
+				document.querySelector('.brand-title-top g').style.display = '';
+				document.querySelector('.brand-title-top svg').style.transform = 'translate(0px, 0px)';
+				document.querySelector('.brand-title-top g').style.fill = 'var(--color-dark)';
+			} else {				
+				// document.querySelector('.brand-title-top').style.opacity = 0;
+				const [x, y] = elementsDistance(document.querySelector('#logo_sidebar .title svg'), 
+											document.querySelector('.brand-title-top svg'));
+				console.log([x, y]);
+				document.querySelector('.brand-title-top svg').style.transform = `translate(${x}px, ${y}px)`;
+				document.querySelector('.brand-title-top g').style.fill = '#ffffff';
+				setTimeout(function () {
+					// document.querySelector('.brand-title-top g').style.display = 'none';
+					document.querySelector('#logo_sidebar .title').style.display = '';
+				}, 500);
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+
+			// Theme toggler functionality
+			const theme_toggler = document.querySelector('.theme-toggler');
+			theme_toggler.addEventListener('click', () => {
+				document.body.classList.toggle('dark-theme-variables');
+				theme_toggler.querySelector('span:nth-child(1)').classList.toggle('active');
+				theme_toggler.querySelector('span:nth-child(2)').classList.toggle('active');
+				if (document.body.classList.contains('dark-theme-variables')) {
+					Chart.defaults.global.defaultFontColor = getComputedStyle(document.body).getPropertyValue('--color-dark');
+				} else {
+					Chart.defaults.global.defaultFontColor = getComputedStyle(document.body).getPropertyValue('--color-dark');
+				}
+				Chart.helpers.each(Chart.instances, function(instance){
+				  	instance.chart.update();
+				});
+			});
+
+			// Para esconder el menu
+			document.querySelector('.toggle').addEventListener('click', () => {
+				document.querySelector('.navigation').classList.toggle('active');
+				document.querySelector('.main').classList.toggle('active');
+				brandManage();
+			});
+
+			document.querySelectorAll('.navigation a').forEach( (item) => {
+				item.addEventListener('click', () => {
+					if (window.innerWidth <= 1076) {
+						document.querySelector('.navigation').classList.toggle('active');
+						document.querySelector('.main').classList.toggle('active');
+					}
+				});
+			});
+					
+			// Navbar functionality
+			sidebarScroll();
+			window.onscroll = sidebarScroll;
+		});
+		
+
+		
+		// Revisamos cuando se clique un enlace
+		$(document).ready(function(){
+			// Suavizar la navegacion para los enlaces en navbar + footer
+			document.querySelectorAll(".navigation a, footer a[href='#top']").forEach((item) => {
+
+				item.addEventListener('click', function(event) {
+					// Nos aseguramos de que this.hash tenga valor antes de sobreescribirlo
+					if (this.hash !== "") {
+						// Prevenimos el click predeterminado
+						event.preventDefault();
+
+						// Almacenamos el hashtag de la web
+						var hash = this.hash;
+
+						// Usamos el metodo animate() de jQuery para suavizar el scroll
+						// El numero opcional (900) especifica los milisegundos que tarda en hacer scroll
+						$('html, body').animate({
+							scrollTop: document.querySelector(hash).getBoundingClientRect().top
+						}, 900, function(){
+							// Añadimos el hashtag a la URL cuando llegamos a la pagina
+							window.location.hash = hash;
+						});
+					}
+				});
+			});
+			
+			$(window).scroll(function() {
+				$(".slideanim").each(function(){
+					var pos = $(this).offset().top;
+
+					var winTop = $(window).scrollTop();
+						if (pos < winTop + 600) {
+							$(this).addClass("slide");
+						}
+				});
+			});
+
+		})
+
+	</script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

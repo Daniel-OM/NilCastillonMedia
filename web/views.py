@@ -134,13 +134,6 @@ def reset_password(token=None) -> Response | str:
             
     return render_template(template_name_or_list='/user/reset_password.html', token=token)
 
-@loged_views.route(rule="/list", methods=['GET'])
-def user_list() -> str:
-    
-    response: ApiResponse = user_api.get()
-    
-    return response.to_dict()
-
 @loged_views.route(rule="/detail", methods=['GET'])
 @login_required
 def user_detail() -> str:
@@ -155,10 +148,7 @@ def user_edit() -> Response:
     
     data: dict = user_api.formToDict(form=request.form)
     print(data)
-    if 'pricing' in data:
-        response: ApiResponse = user_api.updateSubscription(subscription=data.get('subscription'), pricing=data['pricing'])
-    response: ApiResponse = user_api.update(form={k: v for k, v in data.items() if k not in ['subscription', 'pricing']})
-    
+    response: ApiResponse = user_api.update(form=data)
     response: ApiResponse = user_api.getById(unwanted_keys=['_sa_instance_state', 'active', 'role_id'])
     
     return redirect(location=url_for(endpoint='main_views.dashboard'))

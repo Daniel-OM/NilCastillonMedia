@@ -10,8 +10,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import aliased
 
 from .config import serializer
-from .models import (db, migrate, User, ProjectRol, Language, MediaType, Project,
-                     ProjectInfo, ProjectMedia, Config, ConfigInfo, Social)
+from .models import (db, migrate, User, Language, ProjectRol, ProjectRolInfo, 
+                     MediaType, MediaTypeInfo, Project, ProjectInfo, ProjectMedia, 
+                     Config, ConfigInfo, Social)
 from .email_send import EmailSender
 
 
@@ -84,8 +85,9 @@ class ApiResponse:
 
 class APITemplate:
     
-    def __init__(self, db:SQLAlchemy) -> None:
+    def __init__(self, db:SQLAlchemy, language:str='es') -> None:
         self.db: SQLAlchemy = db
+        self.language: str = language
     
     def formToDict(self, form) -> dict:
         
@@ -101,100 +103,11 @@ class APITemplate:
         self.db.session.commit()
       
 class MasterAPI(APITemplate):
-    
-    class Rol(APITemplate):
-    
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
-        
-        def get(self) -> ApiResponse:
-
-            try:
-                items: list[dict] = [entityToDict(entity=v, hidden_fields=['_sa_instance_state', 'active']) for v in \
-                                    self.db.session.query(ProjectRol).filter(ProjectRol.active == True).all()]
-                
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                    executed=True, description='Rols obtained.',
-                                                    data=items)
-            except Exception as e:
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                    executed=False, description=e,
-                                                    data=[])
-            
-            return response
-        
-        def getById(self, id:int) -> ApiResponse:
-
-            try:
-                item: dict = entityToDict(entity=self.db.session.query(ProjectRol).filter(ProjectRol.id == id).first(), 
-                                          hidden_fields=['_sa_instance_state'])
-                
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                    executed=True, description='Rol obtained.',
-                                                    data=item)
-            except Exception as e:
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                    executed=False, description=e,
-                                                    data={})
-            
-            return response
-        
-        def post(self, name:str, active:bool=True) -> ApiResponse:
-            
-            try:
-                item: ProjectRol = ProjectRol(
-                    name = name.lower(),
-                    active = active)
-                self.db.session.add(item)
-                self.commit()
-
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                    executed=True, description='Rol registered.')    
-                
-            except Exception as e:
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                    executed=False, description=e)
-            
-            return response
-        
-        def update(self, id:int, form:dict={}, name:str=None, active:bool=None) -> ApiResponse:
-            
-            try:
-                data: dict = form
-                if name != None: data['name'] = name
-                if active != None: data['active'] = active
-            
-                self.db.session.query(ProjectRol).filter(ProjectRol.id == id).update(data)
-                self.commit()
-
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                    executed=True, description='Rol updated.')    
-                
-            except Exception as e:
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                    executed=False, description=e)
-            
-            return response
-        
-        def delete(self, id:int) -> ApiResponse:
-            
-            try:
-                self.db.session.query(ProjectRol).filter(ProjectRol.id == id).update({'active': False})
-                self.commit()
-
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                    executed=True, description='Rol deleted.')    
-                
-            except Exception as e:
-                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                    executed=False, description=e)
-            
-            return response
 
     class Language(APITemplate):
     
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
         
         def get(self) -> ApiResponse:
 
@@ -216,6 +129,22 @@ class MasterAPI(APITemplate):
 
             try:
                 item: dict = entityToDict(entity=self.db.session.query(Language).filter(Language.id == id).first(), 
+                                          hidden_fields=['_sa_instance_state'])
+                
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Language obtained.',
+                                                    data=item)
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e,
+                                                    data={})
+            
+            return response
+        
+        def getByCode(self, code:int) -> ApiResponse:
+
+            try:
+                item: dict = entityToDict(entity=self.db.session.query(Language).filter(Language.code == code).first(), 
                                           hidden_fields=['_sa_instance_state'])
                 
                 response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
@@ -281,17 +210,127 @@ class MasterAPI(APITemplate):
                                                     executed=False, description=e)
             
             return response
-
-    class MediaType(APITemplate):
     
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
+    class Rol(APITemplate):
+    
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
+            self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
         
         def get(self) -> ApiResponse:
 
             try:
-                items: list[dict] = [entityToDict(entity=v, hidden_fields=['_sa_instance_state', 'active']) for v in \
-                                    self.db.session.query(MediaType).filter(MediaType.active == True).all()]
+                items: list[dict] = [{**entityToDict(entity=v[0], hidden_fields=['_sa_instance_state']), 
+                                      **{'info': entityToDict(entity=v[1], hidden_fields=['_sa_instance_state'])}} for v in \
+                                    self.db.session.query(ProjectRol, ProjectRolInfo).filter(ProjectRol.active == True) \
+                                        .join(ProjectRolInfo, (ProjectRolInfo.rol_id == ProjectRol.id) & \
+                                                              (ProjectRolInfo.language_id == self.language_id)).all()]
+                
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Rols obtained.',
+                                                    data=items)
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e,
+                                                    data=[])
+            
+            return response
+        
+        def getById(self, id:int) -> ApiResponse:
+
+            try:
+                items: tuple[ProjectRol, ProjectRolInfo] = self.db.session.query(ProjectRol, ProjectRolInfo).filter(ProjectRol.id == id) \
+                                             .join(ProjectRolInfo, (ProjectRolInfo.rol_id == ProjectRol.id) & \
+                                                              (ProjectRolInfo.language_id == self.language_id)).first()
+                item: dict = {**entityToDict(entity=items[0], hidden_fields=['_sa_instance_state']),
+                              **{'info': entityToDict(entity=items[1], hidden_fields=['_sa_instance_state'])}}
+                
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Rol obtained.',
+                                                    data=item)
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e,
+                                                    data={})
+            
+            return response
+        
+        def post(self, rol_id:int, language_id:int, name:str, active:bool=True) -> ApiResponse:
+            
+            try:
+                rol_id: (int | None) = self.getById(rol_id).data.get('id', None)
+                if rol_id == None:
+                    rol: ProjectRol = ProjectRol(
+                        active = active)
+                    self.db.session.add(rol)
+                    self.db.session.flush()
+                    rol_id: int = rol.id
+
+                item: ProjectRolInfo = ProjectRolInfo(
+                    rol_id = rol_id,
+                    language_id = language_id,
+                    name = name.lower(),
+                    active = active)
+                self.db.session.add(item)
+                self.commit()
+
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Rol registered.')    
+                
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e)
+            
+            return response
+        
+        def update(self, id:int, language_id:int, form:dict={}, name:str=None, active:bool=None) -> ApiResponse:
+            
+            try:
+                data: dict = form
+                if name != None: data['name'] = name
+                if active != None: data['active'] = active
+            
+                self.db.session.query(ProjectRolInfo).filter((ProjectRolInfo.rol_id == id) & (ProjectRolInfo.language_id == language_id)).update(data)
+                self.commit()
+
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Rol updated.')    
+                
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e)
+            
+            return response
+        
+        def delete(self, id:int) -> ApiResponse:
+            
+            try:
+                self.db.session.query(ProjectRol).filter(ProjectRol.id == id).update({'active': False})
+                self.commit()
+
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                                    executed=True, description='Rol deleted.')    
+                
+            except Exception as e:
+                response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                    executed=False, description=e)
+            
+            return response
+        
+    class MediaType(APITemplate):
+    
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
+            self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
+        
+        def get(self) -> ApiResponse:
+
+            try:
+                items: list[dict] = [{**entityToDict(entity=v[0], hidden_fields=['_sa_instance_state']), 
+                                      **{'info': entityToDict(entity=v[1], hidden_fields=['_sa_instance_state'])}} for v in \
+                                    self.db.session.query(MediaType, MediaTypeInfo).filter(MediaType.active == True) \
+                                        .join(MediaTypeInfo, (MediaTypeInfo.type_id == MediaType.id) & \
+                                                              (MediaTypeInfo.language_id == self.language_id)).all()]
                 
                 response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
                                                     executed=True, description='MediaTypes obtained.',
@@ -306,8 +345,11 @@ class MasterAPI(APITemplate):
         def getById(self, id:int) -> ApiResponse:
 
             try:
-                item: dict = entityToDict(entity=self.db.session.query(MediaType).filter(MediaType.id == id).first(), 
-                                          hidden_fields=['_sa_instance_state'])
+                items: tuple[MediaType, MediaTypeInfo] = self.db.session.query(MediaType, MediaTypeInfo).filter(MediaType.id == id) \
+                                             .join(MediaTypeInfo, (MediaTypeInfo.type_id == MediaType.id) & \
+                                                              (MediaTypeInfo.language_id == self.language_id)).first()
+                item: dict = {**entityToDict(entity=items[0], hidden_fields=['_sa_instance_state']),
+                              **{'info': entityToDict(entity=items[1], hidden_fields=['_sa_instance_state'])}}
                 
                 response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
                                                     executed=True, description='MediaType obtained.',
@@ -318,11 +360,21 @@ class MasterAPI(APITemplate):
                                                     data={})
             
             return response
-        
-        def post(self, name:str, description:str, active:bool=True) -> ApiResponse:
+
+        def post(self, type_id:int, language_id:int, name:str, description:str, active:bool=True) -> ApiResponse:
             
             try:
-                item: MediaType = MediaType(
+                type_id: (int | None) = self.getById(type_id).data.get('id', None)
+                if type_id == None:
+                    m_type: MediaType = MediaType(
+                        active = active)
+                    self.db.session.add(m_type)
+                    self.db.session.flush()
+                    type_id: int = m_type.id
+
+                item: MediaTypeInfo = MediaTypeInfo(
+                    type_id = type_id,
+                    language_id = language_id,
                     name = name.lower(),
                     description = description,
                     active = active)
@@ -338,7 +390,7 @@ class MasterAPI(APITemplate):
             
             return response
         
-        def update(self, id:int, form:dict={}, name:str=None, description:str=None, active:bool=None) -> ApiResponse:
+        def update(self, id:int, language_id:int, form:dict={}, name:str=None, description:str=None, active:bool=None) -> ApiResponse:
             
             try:
                 data: dict = form
@@ -346,7 +398,7 @@ class MasterAPI(APITemplate):
                 if description != None: data['description'] = description
                 if active != None: data['active'] = active
             
-                self.db.session.query(MediaType).filter(MediaType.id == id).update(data)
+                self.db.session.query(MediaTypeInfo).filter((MediaTypeInfo.type_id == id) & (MediaTypeInfo.language_id == language_id)).update(data)
                 self.commit()
 
                 response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
@@ -375,8 +427,9 @@ class MasterAPI(APITemplate):
 
     class Config(APITemplate):
     
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
+            self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
         
         def get(self) -> ApiResponse:
 
@@ -472,8 +525,9 @@ class MasterAPI(APITemplate):
 
     class ConfigInfo(APITemplate):
     
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
+            self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
         
         def get(self) -> ApiResponse:
 
@@ -582,8 +636,9 @@ class MasterAPI(APITemplate):
 
     class Social(APITemplate):
     
-        def __init__(self, db:SQLAlchemy) -> None:
-            super().__init__(db=db)
+        def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+            super().__init__(db=db, language=language)
+            self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
         
         def get(self) -> ApiResponse:
 
@@ -673,9 +728,10 @@ class MasterAPI(APITemplate):
 
 
 class UserAPI(APITemplate):
-    
-    def __init__(self, db:SQLAlchemy) -> None:
-        super().__init__(db=db)
+
+    def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+        super().__init__(db=db, language=language)
+        self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
                             
     def post(self, email:str, password:str, name:str=None, 
             active:bool=True) -> ApiResponse:
@@ -870,27 +926,23 @@ class UserAPI(APITemplate):
 
 class ProjectAPI(APITemplate):
     
-    def __init__(self, db:SQLAlchemy) -> None:
-        super().__init__(db=db)
+    def __init__(self, db:SQLAlchemy, language:str='es') -> None:
+        super().__init__(db=db, language=language)
+        self.language_id: (int | None) = MasterAPI(db=db, language=language).Language(db=db, language=language).getByCode(code=language).data.get('id', None)
     
     def get(self) -> ApiResponse:
 
         try:
             items: list[dict] = [{**entityToDict(entity=v[0], hidden_fields=['_sa_instance_state']),
-                                  **{'class': entityToDict(entity=v[1], hidden_fields=['_sa_instance_state']),
-                                     'type': entityToDict(entity=v[2], hidden_fields=['_sa_instance_state']),
-                                     'currency': entityToDict(entity=v[3], hidden_fields=['_sa_instance_state']),
-                                     'country': entityToDict(entity=v[4], hidden_fields=['_sa_instance_state'])}} for v in \
-                                    self.db.session.query(Project, AccountClass, AccountType, Currency, Country) \
-                                    .join(UsersAccounts, UsersAccounts.account_id == Account.id) \
-                                    .filter(UsersAccounts.user_id == current_user.id) \
-                                    .join(AccountClass, AccountClass.id == Account.class_id) \
-                                    .join(AccountType, AccountType.id == Account.type_id) \
-                                    .join(Currency, Currency.id == Account.currency_id) \
-                                    .join(Country, Country.id == Account.country_id).all()]
+                                  **{'info': entityToDict(entity=v[1], hidden_fields=['_sa_instance_state'])}} for v in \
+                                    self.db.session.query(Project, ProjectInfo) \
+                                    .join(ProjectInfo, (ProjectInfo.project_id == Project.id) & (ProjectInfo.language_id == self.language_id)).all()]
+            for item in items:
+                item['rol'] = MasterAPI(db=self.db, language=self.language).Rol(db=self.db, language=self.language).getById(id=item['rol_id']).data
+                item['media'] = self.getProjectMedia(project_id=item['id']).data
             
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                            executed=True, description='Accounts list obtained.',
+                                            executed=True, description='Projects list obtained.',
                                             data=items) 
              
         except Exception as e:
@@ -903,96 +955,15 @@ class ProjectAPI(APITemplate):
     def getById(self, id) -> ApiResponse:
 
         try:
-            items: list[dict] = [{**entityToDict(entity=v[0], hidden_fields=['_sa_instance_state']),
-                                  **{'class': entityToDict(entity=v[1], hidden_fields=['_sa_instance_state']),
-                                     'type': entityToDict(entity=v[2], hidden_fields=['_sa_instance_state']),
-                                     'currency': entityToDict(entity=v[3], hidden_fields=['_sa_instance_state']),
-                                     'country': entityToDict(entity=v[4], hidden_fields=['_sa_instance_state'])}} for v in \
-                                    self.db.session.query(Project, AccountClass, AccountType, Currency, Country) \
-                                    .filter(Account.class_id == id) \
-                                    .join(UsersAccounts, UsersAccounts.account_id == Account.id) \
-                                    .filter(UsersAccounts.user_id == current_user.id) \
-                                    .join(AccountClass, AccountClass.id == Account.class_id) \
-                                    .join(AccountType, AccountType.id == Account.type_id) \
-                                    .join(Currency, Currency.id == Account.currency_id) \
-                                    .join(Country, Country.id == Account.country_id).all()]
+            item: tuple[Project, ProjectInfo] = self.db.session.query(Project, ProjectInfo).filter(Project.id == id) \
+                            .join(ProjectInfo, (ProjectInfo.project_id == Project.id) & (ProjectInfo.language_id == self.language_id)).first()
+            item: dict = {**entityToDict(entity=item[0], hidden_fields=['_sa_instance_state']), 
+                          **{'info': entityToDict(entity=item[1], hidden_fields=['_sa_instance_state'])}}
+            item['rol'] = MasterAPI(db=self.db, language=self.language).Rol(db=self.db, language=self.language).getById(id=item['rol_id']).data
+            item['media'] = self.getProjectMedia(project_id=item['id']).data
             
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                            executed=True, description='Accounts list obtained.',
-                                            data=items) 
-             
-        except Exception as e:
-            response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                executed=False, description=e,
-                                                data=[])
-        
-        return response
-    
-    def getComplete(self) -> ApiResponse:
-
-        try:
-            
-            items: list[dict] = [{**entityToDict(entity=v[1], hidden_fields=['_sa_instance_state']),
-                            **{'isowner': v[0],
-                               'creator': entityToDict(entity=v[2], hidden_fields=['_sa_instance_state']),
-                               'type': entityToDict(entity=v[3], hidden_fields=['_sa_instance_state']),
-                               'class': entityToDict(entity=v[4], hidden_fields=['_sa_instance_state']),
-                               'currency': entityToDict(entity=v[5], hidden_fields=['_sa_instance_state']),
-                               'country': entityToDict(entity=v[6], hidden_fields=['_sa_instance_state'])}} \
-                                for v in self.db.session.query(UsersAccounts.owner, Account, User, 
-                                                          AccountType, AccountClass, Currency, Country) \
-                                    .filter(UsersAccounts.user_id == current_user.id) \
-                                    .join(Account, Account.id == UsersAccounts.account_id) \
-                                    .join(User, User.id == Account.creator_id) \
-                                    .join(AccountType, AccountType.id == Account.type_id) \
-                                    .join(AccountClass, AccountClass.id == Account.class_id) \
-                                    .join(Currency, Currency.id == Account.currency_id) \
-                                    .join(Country, Country.id == Account.country_id) \
-                                    .all()]
-            items: list[dict] = [{**item, 
-                                  **{'owner': entityToDict(entity=self.db.session.query(User) \
-                                      .join(UsersAccounts, UsersAccounts.user_id == User.id) \
-                                      .filter((UsersAccounts.account_id == item['id']) & (UsersAccounts.owner == True)), 
-                                    hidden_fields=['_sa_instance_state'])}} for item in items]
-            
-            response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                            executed=True, description='Accounts list obtained.',
-                                            data=items) 
-             
-        except Exception as e:
-            response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
-                                                executed=False, description=e,
-                                                data=[])
-        
-        return response
-    
-    def getById(self, id:int) -> ApiResponse:
-
-        try:
-            v: tuple[bool, Account, User, AccountType, AccountClass, Currency, Country] = \
-                self.db.session.query(UsersAccounts.owner, Account, User, AccountType, AccountClass, Currency, Country) \
-                    .filter(UsersAccounts.user_id == current_user.id, UsersAccounts.account_id == id) \
-                    .join(Account, Account.id == UsersAccounts.account_id) \
-                    .join(User, User.id == Account.creator_id) \
-                    .join(AccountType, AccountType.id == Account.type_id) \
-                    .join(AccountClass, AccountClass.id == Account.class_id) \
-                    .join(Currency, Currency.id == Account.currency_id) \
-                    .join(Country, Country.id == Account.country_id) \
-                    .first()
-            owner: User = self.db.session.query(User) \
-                            .join(UsersAccounts, UsersAccounts.user_id == User.id) \
-                            .filter((UsersAccounts.account_id == v[1].id) & (UsersAccounts.owner == True)).first()
-            item: dict = {**entityToDict(entity=v[1], hidden_fields=['_sa_instance_state']),
-                            **{'isowner': v[0],
-                               'creator': entityToDict(entity=v[2], hidden_fields=['_sa_instance_state']),
-                               'type': entityToDict(entity=v[3], hidden_fields=['_sa_instance_state', 'password']),
-                               'class': entityToDict(entity=v[4], hidden_fields=['_sa_instance_state']),
-                               'currency': entityToDict(entity=v[5], hidden_fields=['_sa_instance_state']),
-                               'country': entityToDict(entity=v[6], hidden_fields=['_sa_instance_state']),
-                               'owner': entityToDict(entity=owner, hidden_fields=['_sa_instance_state', 'password'])}}
-            
-            response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                            executed=True, description='Account obtained.',
+                                            executed=True, description='Project obtained.',
                                             data=item) 
              
         except Exception as e:
@@ -1001,40 +972,53 @@ class ProjectAPI(APITemplate):
                                                 data={})
         
         return response
+    
+    def getProjectMedia(self, project_id:int) -> ApiResponse:
 
-    def post(self, name:str, custom_id:str, description:str, entity:str, type_id:int, 
-             class_id:int, country_id:int, currency_id:int, start_amount:float=0.0) -> ApiResponse:
+        try:
+            items: list[dict] = [{**entityToDict(entity=v, hidden_fields=['_sa_instance_state']),
+                                  **{'type': MasterAPI(db=self.db, language=self.language) \
+                                            .MediaType(db=self.db, language=self.language) \
+                                            .getById(id=v.type_id)}} for v in \
+                                    self.db.session.query(ProjectMedia).filter(ProjectMedia.project_id == project_id).all()]
+            
+            response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
+                                            executed=True, description='Projject Media list obtained.',
+                                            data=items) 
+             
+        except Exception as e:
+            response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 
+                                                executed=False, description=e,
+                                                data=[])
+        
+        return response
+
+    def post(self, project_id:int, rol_id:int, language_id:int, name:str, description:str) -> ApiResponse:
         
         try:
-            item: Account = Account(
-                name = name.lower(), 
-                custom_id = custom_id, 
-                description = description, 
-                entity = entity,
-                creator_id = current_user.id,
-                type_id = type_id,
-                class_id = class_id,
-                start_amount = start_amount,
-                current_amount = start_amount,
-                country_id = country_id,
-                currency_id = currency_id, 
+            project_id: (int | None) = self.getById(id=project_id).data.get('id', None)
+            if project_id == None:
+                project: Project = Project(
+                    rol_id = rol_id,
+                    active = True
+                )
+                self.db.session.add(project)
+                self.db.session.flush()
+                project_id: int = project.id
+            
+            item: ProjectInfo = ProjectInfo(
+                project_id = project_id,
+                language_id = language_id,
+                name = name.lower(),
+                description = description,
                 active = True
             )
             self.db.session.add(item)
-            self.db.session.flush()
-            self.db.session.add(
-                UsersAccounts(
-                    user_id = current_user.id, 
-                    account_id = item.id, 
-                    owner = True,
-                    active = True
-                )
-            )
             
             self.commit()
 
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                executed=True, description='Account registered.',
+                                                executed=True, description='Project registered.',
                                                 data=self.getById(id=item.id).data)
             
         except Exception as e:
@@ -1044,30 +1028,23 @@ class ProjectAPI(APITemplate):
         
         return response
     
-    def update(self, id:int, form:dict={}, name:str=None, custom_id:str=None, description:str=None, 
-               entity:str=None, type_id:int=None, class_id:int=None, start_amount:float=None, 
-               country_id:int=None, currency_id:int=None, current_amount:float=None, 
+    def update(self, id:int, language_id:int, form:dict={}, rol_id:int=None, name:str=None, description:str=None,
                active:bool=None) -> ApiResponse:
         
         try:
             data: dict = form
             if name != None: data['name'] = name
-            if custom_id != None: data['custom_id'] = custom_id
             if description != None: data['description'] = description
-            if entity != None: data['entity'] = entity
-            if type_id != None: data['type_id'] = type_id
-            if class_id != None: data['class_id'] = class_id
-            if start_amount != None: data['start_amount'] = start_amount
-            if current_amount != None: data['current_amount'] = current_amount
-            if country_id != None: data['country_id'] = country_id
-            if currency_id != None: data['currency_id'] = currency_id
             if active != None: data['active'] = active
-        
-            self.db.session.query(Account).filter(Account.id == id).update(data)
+
+            if rol_id != None:
+                self.db.session.query(Project).filter(Project.id == id).update({'rol_id': rol_id})
+
+            self.db.session.query(ProjectInfo).filter((ProjectInfo.project_id == id) & (ProjectInfo.language_id == language_id)).update(data)
             self.commit()
 
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                executed=True, description='Account updated.',
+                                                executed=True, description='Project updated.',
                                                 data=self.getById(id=id).data)    
             
         except Exception as e:
@@ -1080,11 +1057,11 @@ class ProjectAPI(APITemplate):
     def delete(self, id:int) -> ApiResponse:
         
         try:
-            self.db.session.query(Account).filter(Account.id == id).update({'active': False})
+            self.db.session.query(Project).filter(Project.id == id).update({'active': False})
             self.commit()
 
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.SUCCESS, 
-                                                executed=True, description='Account deleted.')    
+                                                executed=True, description='Project deleted.')    
             
         except Exception as e:
             response: ApiResponse = ApiResponse(status=ApiResponse.Status.ERROR, 

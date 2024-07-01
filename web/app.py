@@ -5,11 +5,12 @@ from flask_admin import Admin
 from .views import main_views, loged_views
 from .login import login_manager
 from .config import config
-from .models import (db, migrate, User, ProjectRol, Language, MediaType, Project,
-                     ProjectInfo, ProjectMedia, Config, ConfigInfo, Social)
-from .adminviews import (UserAdmin, ProjectRolAdmin, LanguageAdmin, MediaTypeAdmin, 
-                         ProjectAdmin, ProjectInfoAdmin, ProjectMediaAdmin, ConfigAdmin, 
-                         ConfigInfoAdmin, SocialAdmin)
+from .models import (db, migrate, User, Language, ProjectRol, ProjectRolInfo, MediaType, 
+                     MediaTypeInfo, Project, ProjectInfo, ProjectMedia, Config, 
+                     ConfigInfo, Social)
+from .adminviews import (UserAdmin, LanguageAdmin, ProjectRolAdmin, ProjectRolInfoAdmin, 
+                         MediaTypeAdmin, MediaTypeInfoAdmin, ProjectAdmin, ProjectInfoAdmin, 
+                         ProjectMediaAdmin, ConfigAdmin, ConfigInfoAdmin, SocialAdmin)
 
 # Create App
 application: Flask = Flask(import_name=__name__, instance_relative_config=True)
@@ -50,9 +51,11 @@ migrate.init_app(app=application, db=db)
 
 admin: Admin = Admin(app=application, name='Admin Panel', template_mode='bootstrap4')
 admin.add_view(view=UserAdmin(model=User, session=db.session))
-admin.add_view(view=ProjectRolAdmin(model=ProjectRol, session=db.session))
 admin.add_view(view=LanguageAdmin(model=Language, session=db.session))
+admin.add_view(view=ProjectRolAdmin(model=ProjectRol, session=db.session))
+admin.add_view(view=ProjectRolInfoAdmin(model=ProjectRolInfo, session=db.session))
 admin.add_view(view=MediaTypeAdmin(model=MediaType, session=db.session))
+admin.add_view(view=MediaTypeInfoAdmin(model=MediaTypeInfo, session=db.session))
 admin.add_view(view=ProjectAdmin(model=Project, session=db.session))
 admin.add_view(view=ProjectInfoAdmin(model=ProjectInfo, session=db.session))
 admin.add_view(view=ProjectMediaAdmin(model=ProjectMedia, session=db.session))

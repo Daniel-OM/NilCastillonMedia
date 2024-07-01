@@ -18,14 +18,6 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f'<User {self.id} ({self.name})>'
     
-class ProjectRol(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    active = db.Column(db.Boolean, default=True)
-
-    def __repr__(self) -> str:
-        return f'<ProjectRol {self.name}>'
-    
 class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(80), unique=True, nullable=False)
@@ -35,15 +27,45 @@ class Language(db.Model):
     def __repr__(self) -> str:
         return f'<Language {self.name}>'
     
+class ProjectRol(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self) -> str:
+        return f'<ProjectRol {self.id}>'
+    
+class ProjectRolInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rol_id = db.Column(db.Integer, db.ForeignKey(ProjectRol.id), nullable=False)
+    rol_fk = db.relationship(ProjectRol, backref=db.backref('rol_info_rel', lazy=True))
+    language_id = db.Column(db.Integer, db.ForeignKey(Language.id), nullable=False)
+    language_fk = db.relationship(Language, backref=db.backref('language_rol_rel', lazy=True))
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self) -> str:
+        return f'<ProjectRolInfo {self.name}>'
+    
 class MediaType(db.Model):
     '''Company or Person'''
     id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self) -> str:
+        return f'<MediaType {self.name}>'
+    
+class MediaTypeInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type_id = db.Column(db.Integer, db.ForeignKey(MediaType.id), nullable=False)
+    type_fk = db.relationship(MediaType, backref=db.backref('type_info_rel', lazy=True))
+    language_id = db.Column(db.Integer, db.ForeignKey(Language.id), nullable=False)
+    language_fk = db.relationship(Language, backref=db.backref('language_type_rel', lazy=True))
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(500), unique=False, nullable=True)
     active = db.Column(db.Boolean, default=True)
 
     def __repr__(self) -> str:
-        return f'<MediaType {self.name}>'
+        return f'<MediaTypeInfo {self.name}>'
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
