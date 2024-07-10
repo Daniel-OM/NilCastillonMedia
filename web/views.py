@@ -175,7 +175,65 @@ def templates(filename) -> str:
 
 @main_views.route(rule="/", methods=['GET', 'POST'])
 def main() -> str:
-    return render_template(template_name_or_list='layout.html')
+    carousel: list[dict[str, (str | list[dict[str, str]] | dict[str, str])]] = [
+        {'title': 'Project 1', 'description': 'Movie about fishes', 'media': [{'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/041.webp'}], 'thumbnail': {'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/041.webp'}},
+        {'title': 'Project 2', 'description': 'Movie about fishes', 'media': [{'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/042.webp'}], 'thumbnail': {'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/042.webp'}},
+        {'title': 'Project 3', 'description': 'Movie about fishes', 'media': [{'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/043.webp'}], 'thumbnail': {'type':'img', 'src':'https://mdbcdn.b-cdn.net/img/new/slides/043.webp'}},
+    ]
+    about: dict[str, str] = {
+        'title': 'Who am I?',
+        'subtitle': 'Nil Castillón Gasch',
+        'description': """I'm a film producer and cinematographer who graduated from <a href="https://ecam.es/">ECAM</a> (School of 
+						Cinematography and Audiovisual of the Community of Madrid). Since completing 
+						my studies, I've had the privilege of working on a variety of exciting projects, 
+						both as part of an established production company and as a freelancer. 
+						</br>
+						My career has been a blend of creative and challenging collaborations, where 
+						I've had the opportunity to contribute to music videos for renowned artists 
+						like C. Tangana, as well as commercials for major brands like Cupra. Each project 
+						has allowed me to explore different styles and approaches, greatly enriching my 
+						perspective and skills in the audiovisual industry.
+						</br>
+						One of my strengths is my ability to adapt to the needs and visions of my clients. 
+						Whether capturing the energy and rhythm of a music video or conveying the essence 
+						of a brand in a commercial, I always strive to deeply understand what each project 
+						requires and bring my creativity and technical expertise to achieve exceptional results.
+						</br>
+						I'm here to help bring your vision to life. If you have an idea or a project in mind, 
+						don't hesitate to get in touch with me. I'm excited about the possibility of working 
+						together and creating something amazing!"""
+    }
+    services: dict[str, (str | list[dict[str, str]])] = {
+        'title': 'Services.',
+        'description': '''No two projects are the same, and I tailor my services to fit your specific 
+							vision and requirements. My flexible approach ensures that I can handle any 
+							challenge, whether it's a tight deadline, a limited budget, or a complex 
+							concept. I work closely with you throughout the entire process, providing 
+							personalized attention and expert guidance to achieve your goals.''',
+        'services': [
+            {'title': '01. Cinematographer', 
+             'description': '''With a keen eye for detail and a passion for storytelling, I provide 
+                            top-tier cinematography services that capture the essence of your 
+                            project. From concept development to final cut, I ensure every 
+                            frame is meticulously crafted to convey the desired emotion and 
+                            message. Utilizing state-of-the-art equipment and the latest techniques, 
+                            I deliver stunning visuals that leave a lasting impact.'''},
+            {'title': '02. Producer', 
+             'description': '''From pre-production planning to post-production editing, my video 
+                            production services cover the entire filmmaking process. I specialize 
+                            in creating high-quality content for a variety of purposes, including 
+                            bringing intricate stories to the big screen with cinematic flair, 
+                            enhancing brand image and communication with polished professional videos or 
+                            creating visually dynamic and impactful videos that resonate with audiences.'''}
+        ]
+    }
+    contact: dict[str, str] = {
+        'title': "Let's bring your vision<br>to life.",
+        'subtitle': 'Camara, lights and action.',
+        'action_message': 'Your email address...',
+        'action': 'Contact',
+    }
+    return render_template(template_name_or_list='layout.html', carousel=carousel, about=about, services=services, contact=contact)
 
 @main_views.route(rule="/home", methods=['GET'])
 def home() -> dict[str, (str | bool)]:

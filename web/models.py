@@ -3,7 +3,6 @@ import datetime as dt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_migrate import Migrate
-from more_itertools import quantify
 
 db: SQLAlchemy = SQLAlchemy()
 migrate: Migrate = Migrate()
